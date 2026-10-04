@@ -6,7 +6,6 @@ namespace BotsBolts.Players
     public sealed class PlayerInputReader : MonoBehaviour
     {
         [SerializeField] private InputActionAsset actions;
-        private InputActionAsset instance;
         private InputAction move;
         private InputAction jump;
 
@@ -16,11 +15,12 @@ namespace BotsBolts.Players
 
         public void SetLocalControl(bool value)
         {
-            if (value && instance == null)
+            if (value && move == null)
             {
-                instance = Instantiate(actions);
-                move = instance.FindAction("Player/Move", true);
-                jump = instance.FindAction("Player/Jump", true);
+                // Each owner needs only these two independent actions, not a copy
+                // of every gameplay and UI action in the source asset.
+                move = actions.FindAction("Player/Move", true).Clone();
+                jump = actions.FindAction("Player/Jump", true).Clone();
             }
             if (move == null) return;
             if (value) { move.Enable(); jump.Enable(); }
@@ -31,9 +31,9 @@ namespace BotsBolts.Players
 
         private void OnDestroy()
         {
-            if (instance == null) return;
-            instance.Disable();
-            Destroy(instance);
+            move?.Dispose();
+            jump?.Dispose();
+            move = jump = null;
         }
     }
 }

@@ -21,12 +21,6 @@ namespace BotsBolts.Players
         public bool IsForwardJump { get; private set; }
         public bool IsGrounded => controller != null && controller.enabled && controller.isGrounded && verticalSpeed <= 0;
         public Vector3 PlanarVelocity => actualPlanarVelocity;
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-        private Vector2? validationInput;
-        private bool validationJump;
-        public void SetValidationInput(Vector2? value) => validationInput = value;
-        public void QueueValidationJump() => validationJump = true;
-#endif
 
         private void Awake() => controller = GetComponent<CharacterController>();
 
@@ -40,10 +34,6 @@ namespace BotsBolts.Players
             lastGroundedTime = jumpBufferedUntil = float.NegativeInfinity;
             nextLeapTime = 0;
             IsForwardJump = false;
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            validationInput = null;
-            validationJump = false;
-#endif
             controller.enabled = value;
             input.SetLocalControl(value);
         }
@@ -51,15 +41,11 @@ namespace BotsBolts.Players
         private void Update()
         {
             if (!localControl || !controller.enabled) return;
-            Vector2 movement = input.Movement;
-            bool jumpPressed = input.JumpPressed;
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (validationInput.HasValue) movement = Vector2.ClampMagnitude(validationInput.Value, 1);
-            jumpPressed |= validationJump;
-            validationJump = false;
-#endif
-            float now = Time.time;
-            float delta = Time.deltaTime;
+            Tick(input.Movement, input.JumpPressed, Time.time, Time.deltaTime);
+        }
+
+        private void Tick(Vector2 movement, bool jumpPressed, float now, float delta)
+        {
             if (delta <= 0) return;
             Vector3 viewForward = -settings.CameraOffset;
             viewForward.y = 0;

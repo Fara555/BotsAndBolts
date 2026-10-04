@@ -16,11 +16,12 @@ namespace BotsBolts.Session
     // A scene-scoped service owns transport subscriptions and server-side player admission.
     public sealed class WorkshopSession : IStartable, IDisposable
     {
+        public const int MaxPlayers = 2;
         private readonly NetworkManager network;
         private readonly WorkshopSettings settings;
         private readonly NetworkObject playerPrefab;
         private readonly Transform[] spawnPoints;
-        private readonly Dictionary<int, int> playerSlots = new Dictionary<int, int>(2);
+        private readonly Dictionary<int, int> playerSlots = new Dictionary<int, int>(MaxPlayers);
         private CancellationTokenSource connectCancellation;
         private bool intentionalDisconnect;
         private bool startLocalClient;
@@ -48,7 +49,7 @@ namespace BotsBolts.Session
             network.ServerManager.OnRemoteConnectionState += OnRemoteState;
             network.SceneManager.OnClientLoadedStartScenes += OnLoadedScenes;
             network.TransportManager.Transport.SetPort(settings.Port);
-            network.TransportManager.Transport.SetMaximumClients(2);
+            network.TransportManager.Transport.SetMaximumClients(MaxPlayers);
             network.TimeManager.SetTickRate(30);
             subscribed = true;
         }
@@ -155,12 +156,11 @@ namespace BotsBolts.Session
             player.GetComponent<Players.NetworkPlayer>().ConfigureSlot(slot);
             network.ServerManager.Spawn(player, connection);
             network.SceneManager.AddOwnerToDefaultScene(player);
-            Debug.Log($"[BotsBolts] Spawned player {connection.ClientId} in slot {slot}.");
         }
 
         private int FindFreeSlot()
         {
-            for (int slot = 0; slot < 2; slot++)
+            for (int slot = 0; slot < MaxPlayers; slot++)
                 if (!playerSlots.ContainsValue(slot)) return slot;
             return -1;
         }
@@ -171,7 +171,6 @@ namespace BotsBolts.Session
             {
                 playerSlots.Remove(connection.ClientId);
                 // FishNet despawns owned objects immediately after this callback.
-                Debug.Log($"[BotsBolts] Released player {connection.ClientId}.");
             }
         }
 

@@ -18,7 +18,7 @@ namespace BotsBolts.Session
         protected override void Configure(IContainerBuilder builder)
         {
             if (networkManager == null || settings == null || playerPrefab == null ||
-                panel == null || spawnPoints == null || spawnPoints.Length != 2 ||
+                panel == null || spawnPoints == null || spawnPoints.Length != WorkshopSession.MaxPlayers ||
                 spawnPoints[0] == null || spawnPoints[1] == null)
                 throw new System.InvalidOperationException("Workshop requires settings, network manager, player, panel and two spawn points.");
 
@@ -27,9 +27,6 @@ namespace BotsBolts.Session
             builder.RegisterEntryPoint<WorkshopSession>().AsSelf()
                 .WithParameter(playerPrefab).WithParameter(spawnPoints);
             builder.RegisterComponent(panel);
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            builder.RegisterComponentInHierarchy<Development.NetworkSmokeProbe>();
-#endif
         }
     }
 }
