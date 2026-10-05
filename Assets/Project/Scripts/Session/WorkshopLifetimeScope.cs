@@ -21,6 +21,8 @@ namespace BotsBolts.Session
                 panel == null || spawnPoints == null || spawnPoints.Length != WorkshopSession.MaxPlayers ||
                 spawnPoints[0] == null || spawnPoints[1] == null)
                 throw new System.InvalidOperationException("Workshop requires settings, network manager, player, panel and two spawn points.");
+            if (networkManager.GetComponent<BotsBolts.Interactions.WorkshopInteractions>() == null)
+                throw new System.InvalidOperationException("Workshop requires its battery interaction setup.");
 
             builder.RegisterInstance(networkManager);
             builder.RegisterInstance(settings);

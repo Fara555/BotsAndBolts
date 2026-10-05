@@ -41,8 +41,8 @@ namespace BotsBolts.Players
 
         public override void OnStopClient()
         {
-            motor.SetLocalControl(false);
-            localMarker.SetActive(false);
+            if (motor != null) motor.SetLocalControl(false);
+            if (localMarker != null) localMarker.SetActive(false);
             if (cameraCoordinator != null) cameraCoordinator.Release(transform);
             if (presentation != null) presentation.ResetPose();
             base.OnStopClient();

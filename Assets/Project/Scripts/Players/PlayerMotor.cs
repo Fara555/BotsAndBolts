@@ -34,8 +34,9 @@ namespace BotsBolts.Players
             lastGroundedTime = jumpBufferedUntil = float.NegativeInfinity;
             nextLeapTime = 0;
             IsForwardJump = false;
-            controller.enabled = value;
-            input.SetLocalControl(value);
+            // FishNet stop callbacks can run while Unity is destroying scene components.
+            if (controller != null) controller.enabled = value;
+            if (input != null) input.SetLocalControl(value);
         }
 
         private void Update()

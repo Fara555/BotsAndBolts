@@ -108,6 +108,7 @@ namespace BotsBolts.Editor
                 for (int i = 0; i < shells.Length; i++) array.GetArrayElementAtIndex(i).objectReferenceValue = shells[i];
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 ConfigureAntenna(player, bones.First(t => t.name == "Head"));
+                CarryPoseSetup.Configure(player);
                 PrefabUtility.SaveAsPrefabAsset(player, path);
                 Debug.Log("[BotsBolts] Cartoon robot integrated; five finishes, shared mesh, per-player shell color. Bounds: " + bounds);
             }

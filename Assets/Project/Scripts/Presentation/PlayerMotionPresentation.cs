@@ -11,6 +11,7 @@ namespace BotsBolts.Presentation
         [SerializeField] private Transform leftEye;
         [SerializeField] private Transform rightEye;
         [SerializeField] private RobotFeedback feedback;
+        [SerializeField] private RobotCarryPresentation carry;
         private RobotAnimationPlayback playback;
         private float animationSpeed;
         private Vector3 previousPosition;
@@ -40,6 +41,7 @@ namespace BotsBolts.Presentation
         {
             if (visualRoot == null) return;
             RestoreBonePose();
+            if (carry != null) carry.ResetPose();
             previousPosition = transform.position;
             if (!initialized) basePosition = visualRoot.localPosition;
             initialized = true;
@@ -57,11 +59,20 @@ namespace BotsBolts.Presentation
             visualRoot.localPosition = basePosition;
             visualRoot.localRotation = Quaternion.identity;
             visualRoot.localScale = Vector3.one;
+            if (carry != null && carry.isActiveAndEnabled) carry.SnapToCurrentGrip();
         }
 
         private void OnEnable() => ResetPose();
-        private void Update() => RestoreBonePose();
-        private void OnDisable() => RestoreBonePose();
+        private void Update()
+        {
+            RestoreBonePose();
+            if (carry != null) carry.RestorePose();
+        }
+        private void OnDisable()
+        {
+            RestoreBonePose();
+            if (carry != null) carry.ResetPose();
+        }
 
         private void RestoreBonePose()
         {
@@ -120,6 +131,7 @@ namespace BotsBolts.Presentation
             UpdateHeadAndEyes(delta, airborne);
             UpdateFeedback(speed, airborne, acceleration, hasSurface, surface);
             UpdateGroundMarker(hasSurface, surface);
+            if (carry != null && carry.isActiveAndEnabled) carry.ApplyPose(delta);
         }
 
         private void UpdateBody(float delta, float speed, bool airborne, Vector3 localAcceleration)

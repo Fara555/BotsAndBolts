@@ -8,6 +8,9 @@ namespace BotsBolts.Session
     {
         [Title("Connection"), SerializeField, MinValue(1)] private int port = 7770;
         [SerializeField, Range(5, 60)] private float connectionTimeout = 12f;
+        [Title("Interaction"), SerializeField, Range(0.8f, 2.5f)] private float interactionRange = 1.65f;
+        [SerializeField, Range(0.1f, 0.6f)] private float interactionCooldown = 0.2f;
+        [SerializeField, Range(2, 32)] private int batteryLimit = 16;
         [Title("Movement"), SerializeField, Range(1, 10)] private float moveSpeed = 4.5f;
         [SerializeField, Range(90, 1080)] private float turnSpeed = 720f;
         [SerializeField, Range(5, 80)] private float acceleration = 28f;
@@ -29,6 +32,9 @@ namespace BotsBolts.Session
         public ushort Port => (ushort)Mathf.Clamp(port, 1, ushort.MaxValue);
         public float ConnectionTimeout => connectionTimeout;
         public float MoveSpeed => moveSpeed;
+        public float InteractionRange => interactionRange;
+        public float InteractionCooldown => interactionCooldown;
+        public int BatteryLimit => batteryLimit;
         public float TurnSpeed => turnSpeed;
         public float Acceleration => acceleration;
         public float Braking => braking;
@@ -50,6 +56,9 @@ namespace BotsBolts.Session
         {
             port = Mathf.Clamp(port, 1, ushort.MaxValue);
             connectionTimeout = Mathf.Clamp(connectionTimeout, 5, 60);
+            interactionRange = Mathf.Clamp(interactionRange, .8f, 2.5f);
+            interactionCooldown = Mathf.Clamp(interactionCooldown, .1f, .6f);
+            batteryLimit = Mathf.Clamp(batteryLimit, 2, 32);
             moveSpeed = Mathf.Clamp(moveSpeed, 1, 10);
             turnSpeed = Mathf.Clamp(turnSpeed, 90, 1080);
             acceleration = Mathf.Clamp(acceleration, 5, 80);
