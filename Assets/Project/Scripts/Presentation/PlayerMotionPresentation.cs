@@ -111,14 +111,14 @@ namespace BotsBolts.Presentation
                 float strength = Mathf.Clamp(-previousVertical / 6, .35f, 1.2f);
                 compressionVelocity += strength * 2.4f;
                 eyeReaction = .7f;
-                if (feedback != null) feedback.Land(strength);
+                if (feedback != null && hasSurface) feedback.Land(strength, surface.point, surface.normal);
             }
             wasAirborne = airborne;
             gait += speed * delta * 1.75f;
             gait = playback.GaitPhase(gait, speed);
             UpdateBody(delta, speed, airborne, localAcceleration);
             UpdateHeadAndEyes(delta, airborne);
-            UpdateFeedback(speed, airborne, acceleration);
+            UpdateFeedback(speed, airborne, acceleration, hasSurface, surface);
             UpdateGroundMarker(hasSurface, surface);
         }
 
@@ -164,13 +164,13 @@ namespace BotsBolts.Presentation
             boneOffsetsApplied = true;
         }
 
-        private void UpdateFeedback(float speed, bool airborne, Vector3 acceleration)
+        private void UpdateFeedback(float speed, bool airborne, Vector3 acceleration, bool hasSurface, RaycastHit surface)
         {
             int footstep = Mathf.FloorToInt(gait / Mathf.PI);
             if (footstep != previousStep && !airborne && speed > 1 && feedback != null) feedback.Step(footstep);
             previousStep = footstep;
-            if (!airborne && speed > 1.2f && Vector3.Dot(acceleration, filteredVelocity.normalized) < -12 && feedback != null)
-                feedback.Brake();
+            if (!airborne && hasSurface && speed > 1.2f && Vector3.Dot(acceleration, filteredVelocity.normalized) < -12 && feedback != null)
+                feedback.Brake(surface.point, surface.normal, filteredVelocity);
         }
 
         private void UpdateGroundMarker(bool hasSurface, RaycastHit surface)

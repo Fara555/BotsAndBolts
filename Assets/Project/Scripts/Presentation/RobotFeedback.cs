@@ -8,14 +8,14 @@ namespace BotsBolts.Presentation
         [SerializeField] private AudioClip stepClip;
         [SerializeField] private AudioClip leapClip;
         [SerializeField] private AudioClip landClip;
-        [SerializeField] private ParticleSystem dust;
+        [SerializeField] private RobotDustEffect dust;
         private float nextBrakeTime;
 
         public void ResetFeedback()
         {
             nextBrakeTime = 0;
             if (audioSource != null) audioSource.Stop();
-            if (dust != null) dust.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            if (dust != null) dust.Clear();
         }
 
         public void Step(int index)
@@ -34,28 +34,22 @@ namespace BotsBolts.Presentation
             }
         }
 
-        public void Land(float strength)
+        public void Land(float strength, Vector3 point, Vector3 normal)
         {
             if (audioSource != null && landClip != null)
             {
                 audioSource.pitch = 1.05f - strength * .12f;
                 audioSource.PlayOneShot(landClip, strength * .65f);
             }
-            EmitDust(Mathf.RoundToInt(6 * strength), .13f * strength);
+            nextBrakeTime = Time.time + .25f;
+            if (dust != null) dust.Emit(point, normal, transform.forward, strength, false);
         }
 
-        public void Brake()
+        public void Brake(Vector3 point, Vector3 normal, Vector3 direction)
         {
             if (Time.time < nextBrakeTime) return;
             nextBrakeTime = Time.time + .25f;
-            EmitDust(3, .08f);
-        }
-
-        private void EmitDust(int count, float size)
-        {
-            if (dust == null) return;
-            var emit = new ParticleSystem.EmitParams { position = new Vector3(transform.position.x, .06f, transform.position.z), startSize = size };
-            dust.Emit(emit, count);
+            if (dust != null) dust.Emit(point, normal, direction, .7f, true);
         }
     }
 }
