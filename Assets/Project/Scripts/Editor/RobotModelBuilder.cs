@@ -73,9 +73,9 @@ namespace BotsBolts.Editor
                 {
                     string finish = renderer.gameObject.name;
                     Color color = finish == "RobotShell" ? Color.white :
-                        finish == "RobotTrim" ? new Color(.065f,.105f,.135f) :
-                        finish == "RobotVisor" ? new Color(.006f,.022f,.032f) :
-                        finish == "RobotEyes" ? new Color(.68f,.97f,1) : new Color(.79f,.85f,.84f);
+                        finish == "RobotTrim" ? new Color(.045f,.05f,.055f) :
+                        finish == "RobotVisor" ? new Color(.009f,.011f,.014f) :
+                        finish == "RobotEyes" ? new Color(1,.95f,.87f) : new Color(.58f,.60f,.61f);
                     string materialPath = Folder + finish + ".mat";
                     Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
                     if (material == null)
@@ -84,8 +84,8 @@ namespace BotsBolts.Editor
                         AssetDatabase.CreateAsset(material, materialPath);
                     }
                     material.SetColor("_BaseColor", color);
-                    material.SetFloat("_Smoothness", finish == "RobotVisor" ? .78f : .55f);
-                    material.SetFloat("_Metallic", finish == "RobotEyes" ? 0 : .12f);
+                    material.SetFloat("_Smoothness", finish == "RobotShell" ? .38f : finish == "RobotVisor" ? .48f : finish == "RobotTrim" ? .34f : finish == "RobotEyes" ? .3f : .4f);
+                    material.SetFloat("_Metallic", finish == "RobotEyes" ? 0 : finish == "RobotIvory" ? .5f : finish == "RobotTrim" ? .25f : finish == "RobotVisor" ? .12f : .06f);
                     if (finish == "RobotEyes")
                     {
                         material.EnableKeyword("_EMISSION");
